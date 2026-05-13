@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amour Doré - Invitation de Mariage</title>
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <!-- AOS for Scroll Animations -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --soft-pink: #FFF0F5;
+            --deep-pink: #FFB6C1;
+            --text-dark: #4A4A4A;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text-dark);
+            background-color: white;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        h1, h2 { font-family: 'Great Vibes', cursive; color: var(--gold); }
+
+        /* --- Hero Section --- */
+        .hero {
+            height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), 
+                        url('img/Gemini_Generated_Image_2i4alo2i4alo2i4a.png') center/cover no-repeat;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+        }
+
+        .hero h1 { font-size: 5rem; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+
+        /* --- Countdown --- */
+        .countdown {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+            border: 1px solid var(--gold);
+        }
+
+        .timer-unit { font-size: 1.5rem; font-weight: 600; }
+        .timer-label { font-size: 0.8rem; text-transform: uppercase; }
+
+        /* --- Carousel --- */
+        .carousel-container {
+            padding: 80px 20px;
+            background: var(--soft-pink);
+            text-align: center;
+        }
+
+        .carousel {
+            max-width: 800px;
+            margin: 40px auto;
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .slides { display: flex; transition: transform 0.3s ease-in-out; }
+        .slide { min-width: 100%; height: 500px; object-fit: cover; }
+
+        /* --- Story Section --- */
+        .story { padding: 100px 20px; text-align: center; max-width: 700px; margin: 0 auto; }
+        .story h2 { font-size: 3.5rem; margin-bottom: 30px; }
+        .story p { line-height: 1.8; font-size: 1.1rem; }
+
+        /* --- Program --- */
+        .program {
+            background: var(--soft-pink);
+            padding: 80px 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            text-align: center;
+        }
+
+        .event-card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            border-bottom: 5px solid var(--gold);
+            transition: transform 0.3s;
+        }
+        .event-card:hover { transform: translateY(-10px); }
+        .event-card i { font-size: 2rem; color: var(--gold); margin-bottom: 15px; }
+
+        /* --- RSVP Form --- */
+        .rsvp-section { padding: 100px 20px; background: white; }
+        .rsvp-form {
+            max-width: 500px;
+            margin: 0 auto;
+            background: var(--soft-pink);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .form-group { margin-bottom: 20px; text-align: left; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+        }
+        input:focus { border-color: var(--gold); }
+
+        .btn-submit {
+            background: var(--gold);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            width: 100%;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: opacity 0.3s;
+        }
+        .btn-submit:disabled { background: #ccc; cursor: not-allowed; }
+
+        #error-msg { color: #d9534f; margin-top: 10px; font-size: 0.9rem; display: none; }
+        #success-msg { color: #5cb85c; margin-top: 10px; font-weight: bold; display: none; }
+    </style>
+</head>
+<body>
+
+    <!-- HERO -->
+    <section class="hero">
+        <h1 data-aos="zoom-in">Sarah & Simonc</h1>
+        <p>Se disent "Oui" le 15 Août 2026</p>
+        
+        <div class="countdown" id="countdown">
+            <div class="timer-box"><div id="days" class="timer-unit">00</div><div class="timer-label">Jours</div></div>
+            <div class="timer-box"><div id="hours" class="timer-unit">00</div><div class="timer-label">Hrs</div></div>
+            <div class="timer-box"><div id="mins" class="timer-unit">00</div><div class="timer-label">Min</div></div>
+            <div class="timer-box"><div id="secs" class="timer-unit">00</div><div class="timer-label">Sec</div></div>
+        </div>
+    </section>
+
+    <!-- CAROUSEL -->
+    <section class="carousel-container">
+        <h2 data-aos="fade-up">Nos Moments Précieux</h2>
+        <div class="carousel">
+            <div class="slides" id="slides">
+                <img class="slide" src="img/Gemini_Generated_Image_9d184q9d184q9d18.png" alt="Couple 1">
+                <img class="slide" src="img/Gemini_Generated_Image_veowg1veowg1veow.png" alt="Couple 2">
+                <img class="slide" src="img/Gemini_Generated_Image_5wwbsp5wwbsp5wwb.png" alt="Couple 3">
+                <img class="slide" src="img/Gemini_Generated_Image_qi4axxqi4axxqi4a.png" alt="Couple 4">
+                <img class="slide" src="img/Gemini_Generated_Image_veowg1veowg1veow.png" alt="Couple 5">
+                <img class="slide" src="img/b.png" alt="Couple 6">
+            </div>
+        </div>
+    </section>
+
+    <!-- OUR STORY -->
+    <section class="story" data-aos="fade-up">
+        <h2>Notre Rencontre</h2>
+        <p>
+            Tout a commencé par un regard échangé dans une petite librairie de Paris. 
+            Entre deux étagères de poésie, nos mains se sont frôlées en cherchant le même livre. 
+            Ce qui n'était qu'un hasard est devenu une évidence. Trois ans plus tard, nous sommes 
+            heureux de vous inviter à célébrer le prochain chapitre de notre histoire sous le signe de l'<b>Amour Doré</b>.
+        </p>
+    </section>
+
+    <!-- RSVP FORM -->
+    <section class="rsvp-section">
+        <div class="rsvp-form" data-aos="fade-up">
+            <h2 style="text-align: center; margin-bottom: 30px;">Confirmez votre présence</h2>
+            <form id="form-rsvp">
+                <div class="form-group">
+                    <label>Votre Nom Complet</label>
+                    <input type="text" id="guest-name" placeholder="Ex: Jean Dupont" required>
+                    <p id="error-msg">Désolé, votre nom ne figure pas sur la liste. Bien vouloir Contactez les mariés.</p>
+                </div>
+
+                <div id="extended-form" style="display: none;">
+                    <div class="form-group">
+                        <label>Numéro de Téléphone</label>
+                        <input type="tel" id="guest-phone" placeholder="+237 ...">
+                    </div>
+                    <div class="form-group">
+                        <label>Serez-vous accompagné ?</label>
+                        <select id="is-accompanied">
+                            <option value="no">Non</option>
+                            <option value="yes">Oui</option>
+                        </select>
+                        <p id="full-msg" style="color: #d9534f; margin-top: 5px; display: none;">Désolé, les places accompagnateurs sont épuisées.</p>
+                    </div>
+                    <button type="submit" class="btn-submit">Valider ma présence</button>
+                </div>
+            </form>
+            <p id="success-msg">Merci ! Votre présence est bien enregistrée.</p>
+        </div>
+    </section>
+    
+    <!-- PROGRAM -->
+    <section class="program">
+        <div class="event-card" data-aos="flip-left">
+            <i class="fas fa-gavel"></i>
+            <h3>La Mairie</h3>
+            <p>Hôtel de Ville de Douala</p>
+            <p><strong>10:00 AM</strong></p>
+        </div>
+        <div class="event-card" data-aos="flip-left" data-aos-delay="200">
+            <i class="fas fa-church"></i>
+            <h3>L'Église</h3>
+            <p>Cathédrale Saints-Pierre-et-Paul</p>
+            <p><strong>13:00 PM</strong></p>
+        </div>
+        <div class="event-card" data-aos="flip-left" data-aos-delay="400">
+            <i class="fas fa-glass-cheers"></i>
+            <h3>La Soirée</h3>
+            <p>Palais des Congrès - Salle Gold</p>
+            <p><strong>19:00 PM</strong></p>
+        </div>
+    </section>
+
+    <!-- SCRIPTS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 1000 });
+
+        // --- GUEST LIST SIMULATION ---
+        const guestList = ["Jean Dupont", "Marie Claire", "Ernest Kemheu", "Nde Léopoldine", "Marc Rema"];
+        let remainingPlaces = 5; // Simulation de places restantes pour accompagnateurs
+
+        // --- COUNTDOWN LOGIC ---
+        const weddingDate = new Date("Aug 15, 2026 10:00:00").getTime();
+        
+        setInterval(() => {
+            const now = new Date().getTime();
+            const distance = weddingDate - now;
+            
+            document.getElementById("days").innerText = Math.floor(distance / (1000 * 60 * 60 * 24));
+            document.getElementById("hours").innerText = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            document.getElementById("mins").innerText = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            document.getElementById("secs").innerText = Math.floor((distance % (1000 * 60)) / 1000);
+        }, 1000);
+
+        // --- CAROUSEL LOGIC ---
+        let currentSlide = 0;
+        const slides = document.getElementById("slides");
+        setInterval(() => {
+            currentSlide = (currentSlide + 1) % 6;
+            slides.style.transform = `translateX(-${currentSlide * 100}%)`;
+        }, 4000);
+
+        // --- RSVP LOGIC ---
+        const nameInput = document.getElementById("guest-name");
+        const extendedForm = document.getElementById("extended-form");
+        const errorMsg = document.getElementById("error-msg");
+        const accompaniedSelect = document.getElementById("is-accompanied");
+        const fullMsg = document.getElementById("full-msg");
+        const btnSubmit = document.querySelector(".btn-submit");
+
+        nameInput.addEventListener("input", function() {
+            if (guestList.includes(this.value)) {
+                extendedForm.style.display = "block";
+                errorMsg.style.display = "none";
+            } else {
+                extendedForm.style.display = "none";
+                if(this.value.length > 5) errorMsg.style.display = "block";
+            }
+        });
+
+        accompaniedSelect.addEventListener("change", function() {
+            if (this.value === "yes" && remainingPlaces <= 0) {
+                fullMsg.style.display = "block";
+                btnSubmit.disabled = true;
+            } else {
+                fullMsg.style.display = "none";
+                btnSubmit.disabled = false;
+            }
+        });
+
+        document.getElementById("form-rsvp").addEventListener("submit", (e) => {
+            e.preventDefault();
+            document.getElementById("form-rsvp").style.display = "none";
+            document.getElementById("success-msg").style.display = "block";
+        });
+    </script>
+</body>
+</html>

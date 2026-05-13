@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amour Doré - Système Premium</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --soft-pink: #FFF0F5;
+            --deep-pink: #FFB6C1;
+            --white: #ffffff;
+            --dark: #2c2c2c;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Montserrat', sans-serif; color: var(--dark); overflow-x: hidden; background: var(--white); }
+        h1, h2, h3 { font-family: 'Great Vibes', cursive; color: var(--gold); }
+
+        /* --- NAVIGATION --- */
+        nav {
+            position: fixed; top: 0; width: 100%; padding: 20px;
+            display: flex; justify-content: space-between; z-index: 1000;
+            background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px);
+        }
+
+        .btn-admin-toggle {
+            background: var(--gold); color: white; border: none;
+            padding: 8px 15px; border-radius: 20px; cursor: pointer; font-size: 0.8rem;
+        }
+
+        /* --- HERO & PLACES LIBRES --- */
+        .hero {
+            height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), 
+                        url('https://images.unsplash.com/photo-1519225421980-715cb0215aed?q=80&w=2070&auto=format&fit=crop') center/cover;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; text-align: center;
+        }
+
+        .hero h1 { font-size: 5rem; text-shadow: 3px 3px 6px rgba(0,0,0,0.3); }
+
+        .seats-counter {
+            margin-top: 20px; background: rgba(212, 175, 55, 0.9);
+            padding: 15px 30px; border-radius: 50px; border: 2px solid white;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* --- ADMIN PANEL (MODAL) --- */
+        #admin-panel {
+            display: none; position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); width: 90%; max-width: 600px;
+            background: white; padding: 30px; border-radius: 20px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5); z-index: 2000;
+            max-height: 80vh; overflow-y: auto;
+        }
+
+        .admin-header { border-bottom: 2px solid var(--gold); margin-bottom: 20px; padding-bottom: 10px; }
+        .admin-grid { display: grid; gap: 15px; }
+        .guest-list-item { display: flex; justify-content: space-between; padding: 10px; background: var(--soft-pink); border-radius: 8px; margin-top: 5px; }
+
+        /* --- FORMULAIRE --- */
+        .rsvp-section { padding: 80px 20px; background: var(--soft-pink); }
+        .rsvp-card { max-width: 500px; margin: 0 auto; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        
+        input, select, button { width: 100%; padding: 12px; margin-top: 10px; border-radius: 8px; border: 1px solid #ddd; }
+        .btn-gold { background: var(--gold); color: white; border: none; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-gold:hover { background: #b8952d; }
+
+        .hidden { display: none; }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1500; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div style="font-family: 'Great Vibes'; font-size: 1.5rem; color: var(--gold);">Amour Doré</div>
+        <button class="btn-admin-toggle" onclick="toggleAdmin()">⚙️ Dashboard Mariés</button>
+    </nav>
+
+    <!-- ADMIN PANEL -->
+    <div id="overlay" class="overlay" onclick="toggleAdmin()"></div>
+    <div id="admin-panel">
+        <div class="admin-header">
+            <h2>Gestion du Mariage</h2>
+        </div>
+        <div class="admin-grid">
+            <div>
+                <label>Nombre total de places disponibles :</label>
+                <input type="number" id="total-capacity-input" placeholder="Ex: 100">
+                <button class="btn-gold" onclick="updateCapacity()" style="margin-top: 5px;">Mettre à jour la capacité</button>
+            </div>
+            <hr>
+            <div>
+                <label>Ajouter un invité à la liste (Nom Complet) :</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="new-guest-name" placeholder="Ex: Jean Dupont">
+                    <button class="btn-gold" onclick="addGuest()" style="width: 100px;">Ajouter</button>
+                </div>
+            </div>
+            <div>
+                <h3>Liste des invités autorisés (<span id="count-guests">0</span>)</h3>
+                <div id="admin-guest-list">
+                    <!-- Liste générée en JS -->
+                </div>
+            </div>
+        </div>
+        <button onclick="toggleAdmin()" style="background: #eee; border: none; margin-top: 20px; cursor: pointer;">Fermer</button>
+    </div>
+
+    <!-- CLIENT VIEW -->
+    <section class="hero">
+        <h1 data-aos="fade-down">Sarah & Marc</h1>
+        <div class="seats-counter" data-aos="zoom-in">
+            <span style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px;">Places Encore Libres</span><br>
+            <span id="remaining-seats-display" style="font-size: 2.5rem; font-weight: bold;">0</span>
+        </div>
+    </section>
+
+    <section class="rsvp-section">
+        <div class="rsvp-card" data-aos="fade-up">
+            <h2 style="text-align: center;">Confirmez votre venue</h2>
+            <div id="step-1">
+                <label>Entrez votre nom complet pour continuer :</label>
+                <input type="text" id="client-name-check" placeholder="Votre nom tel qu'écrit sur l'invitation">
+                <button class="btn-gold" onclick="verifyGuest()">Vérifier mon invitation</button>
+                <p id="error-check" style="color: red; display: none; margin-top: 10px; font-size: 0.8rem;">Votre nom n'est pas sur la liste. Veuillez contacter les mariés.</p>
+            </div>
+
+            <div id="step-2" class="hidden">
+                <p>Bienvenue <strong id="display-guest-name"></strong> !</p>
+                <input type="tel" id="client-phone" placeholder="Votre numéro de téléphone">
+                <label style="display: block; margin-top: 15px;">Serez-vous accompagné ?</label>
+                <select id="client-accompanied" onchange="checkCapacityPreview()">
+                    <option value="0">Non, je viens seul(e)</option>
+                    <option value="1">Oui, je viens avec 1 personne</option>
+                </select>
+                <p id="capacity-warning" style="color: red; display: none; margin-top: 5px;">Désolé, il n'y a plus de place pour un accompagnateur.</p>
+                <button id="submit-rsvp" class="btn-gold" onclick="submitFinalRSVP()">Confirmer ma présence</button>
+            </div>
+
+            <div id="step-success" class="hidden" style="text-align: center;">
+                <i class="fas fa-check-circle" style="color: var(--gold); font-size: 3rem; margin-bottom: 10px;"></i>
+                <h3>Merci !</h3>
+                <p>Votre présence est enregistrée.</p>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init();
+
+        // --- DATABASE SIMULATION (LOCALSTORAGE) ---
+        let db = JSON.parse(localStorage.getItem('weddingDB')) || {
+            totalCapacity: 50,
+            invitedList: ["Ernest Kemheu", "Nde Léopoldine"],
+            confirmedGuests: []
+        };
+
+        function saveDB() {
+            localStorage.setItem('weddingDB', JSON.stringify(db));
+            updateUI();
+        }
+
+        // --- UI UPDATES ---
+        function updateUI() {
+            // Calcul des places restantes
+            // 1 place par confirmé + leurs accompagnateurs
+            const takenSeats = db.confirmedGuests.reduce((acc, guest) => acc + 1 + parseInt(guest.accompanied), 0);
+            const remaining = db.totalCapacity - takenSeats;
+            
+            document.getElementById('remaining-seats-display').innerText = remaining > 0 ? remaining : 0;
+            document.getElementById('count-guests').innerText = db.invitedList.length;
+            
+            // Liste admin
+            const listContainer = document.getElementById('admin-guest-list');
+            listContainer.innerHTML = '';
+            db.invitedList.forEach(guest => {
+                const div = document.createElement('div');
+                div.className = 'guest-list-item';
+                div.innerHTML = `<span>${guest}</span><button onclick="removeGuest('${guest}')" style="background:none; border:none; color:red; cursor:pointer;">❌</button>`;
+                listContainer.appendChild(div);
+            });
+        }
+
+        // --- ADMIN FUNCTIONS ---
+        function toggleAdmin() {
+            const panel = document.getElementById('admin-panel');
+            const overlay = document.getElementById('overlay');
+            const isVisible = panel.style.display === 'block';
+            panel.style.display = isVisible ? 'none' : 'block';
+            overlay.style.display = isVisible ? 'none' : 'block';
+        }
+
+        function updateCapacity() {
+            const val = document.getElementById('total-capacity-input').value;
+            if(val) {
+                db.totalCapacity = parseInt(val);
+                saveDB();
+                alert("Capacité mise à jour !");
+            }
+        }
+
+        function addGuest() {
+            const name = document.getElementById('new-guest-name').value.trim();
+            if(name && !db.invitedList.includes(name)) {
+                db.invitedList.push(name);
+                document.getElementById('new-guest-name').value = '';
+                saveDB();
+            }
+        }
+
+        function removeGuest(name) {
+            db.invitedList = db.invitedList.filter(g => g !== name);
+            saveDB();
+        }
+
+        // --- CLIENT FUNCTIONS ---
+        function verifyGuest() {
+            const name = document.getElementById('client-name-check').value.trim();
+            if(db.invitedList.includes(name)) {
+                document.getElementById('step-1').classList.add('hidden');
+                document.getElementById('step-2').classList.remove('hidden');
+                document.getElementById('display-guest-name').innerText = name;
+            } else {
+                document.getElementById('error-check').style.display = 'block';
+            }
+        }
+
+        function checkCapacityPreview() {
+            const acc = parseInt(document.getElementById('client-accompanied').value);
+            const takenSeats = db.confirmedGuests.reduce((acc, guest) => acc + 1 + parseInt(guest.accompanied), 0);
+            const remaining = db.totalCapacity - takenSeats;
+
+            if(acc > 0 && remaining < 2) { // 1 pour soi + 1 pour l'accompagnateur
+                document.getElementById('capacity-warning').style.display = 'block';
+                document.getElementById('submit-rsvp').disabled = true;
+            } else {
+                document.getElementById('capacity-warning').style.display = 'none';
+                document.getElementById('submit-rsvp').disabled = false;
+            }
+        }
+
+        function submitFinalRSVP() {
+            const name = document.getElementById('display-guest-name').innerText;
+            const phone = document.getElementById('client-phone').value;
+            const accompanied = document.getElementById('client-accompanied').value;
+
+            db.confirmedGuests.push({ name, phone, accompanied });
+            // On peut aussi retirer la personne de la liste d'invitation pour qu'elle ne vote pas 2 fois
+            db.invitedList = db.invitedList.filter(g => g !== name);
+            
+            saveDB();
+            document.getElementById('step-2').classList.add('hidden');
+            document.getElementById('step-success').classList.remove('hidden');
+        }
+
+        // Initialisation
+        updateUI();
+    </script>
+</body>
+</html>
